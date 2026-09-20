@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring Launcher Tilt Playground — Lecture Edition</title>
+<style>
+:root{--bg:#f7f8fa;--panel:#fff;--text:#18232d;--muted:#5d6a75;--border:#d8dee5;--accent:#2f5f8f;--good:#2f7d4a;--bad:#a23b32;--gold:#9a6800;--line:#263746}
+*{box-sizing:border-box}body{margin:0;padding:8px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto}.topbar{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap}
+h1{font-size:24px;line-height:1.1;margin:0 0 4px}.subtitle{margin:0;color:var(--muted);font-size:15px}.modebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.switchline{display:flex;align-items:center;gap:8px;font-weight:700}input[type=checkbox]{width:20px;height:20px}
+button{border:1px solid var(--border);background:#fff;color:var(--text);border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
+button:hover{background:#f1f4f7}.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.8fr);gap:10px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:10px}.controls{display:grid;gap:10px;align-content:start}
+.control label{display:flex;justify-content:space-between;gap:12px;font-weight:800;font-size:15px}.control small{display:block;color:var(--muted);margin-top:4px}
+input[type=range]{width:100%;margin-top:4px;height:20px}.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.quick button{padding:7px 10px;font-size:13px}
+.readout{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{border:1px solid var(--border);border-radius:12px;padding:8px;min-width:0}
+.metric .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.metric .v{font-size:18px;font-weight:850;margin-top:3px;word-break:break-word}
+.status{grid-column:1/-1}.status.good{background:rgba(47,125,74,.06);border-color:rgba(47,125,74,.45)}.status.bad{background:rgba(162,59,50,.06);border-color:rgba(162,59,50,.45)}
+.hidden{display:none!important}.callout{margin-top:12px;padding:8px 14px;border-left:4px solid var(--accent);background:#f3f6f9;border-radius:8px;font-size:15px}
+.prompt{margin-top:12px;border:1px dashed var(--accent);border-radius:10px;padding:8px 14px;background:#fbfdff;font-weight:750}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#fbfcfd;border:1px solid var(--border);border-radius:10px;padding:11px 12px;overflow:auto;white-space:pre-wrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:8px}.sw{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+svg{width:100%;height:auto;display:block}.footer{font-size:12.5px;color:var(--muted);margin-top:14px}@media(max-width:900px){.grid{grid-template-columns:1fr}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topbar">
+<div><h1>Spring Launcher Tilt Playground</h1><p class="subtitle">Compact Canvas lecture edition · <b>t</b> on the vertical (y) axis</p></div>
+<div class="modebox"><label class="switchline"><input id="lectureMode" type="checkbox" checked>Lecture Mode</label><button id="resetBtn" type="button">Reset</button></div>
+</div>
+
+<div class="presets">
+<button type="button" data-preset="nominal">Nominal 1.0 in</button>
+<button type="button" data-preset="wc1">1.0 in worst case</button>
+<button type="button" data-preset="nom075">Nominal 0.75 in</button>
+<button type="button" data-preset="wc075">0.75 in worst case</button>
+</div>
+
+<div class="grid">
+<section class="panel">
+<svg id="geom" viewBox="0 0 760 470" role="img" aria-label="Spring launcher tilt geometry with t on the vertical axis">
+<line x1="95" y1="400" x2="690" y2="400" stroke="#9aa7b2" stroke-width="2"/>
+<line x1="95" y1="400" x2="95" y2="45" stroke="#9aa7b2" stroke-width="2"/>
+<text x="697" y="406" font-size="16" fill="#5d6a75">x</text><text x="86" y="35" font-size="16" fill="#5d6a75">y</text>
+<line id="tGuide" x1="95" y1="400" x2="95" y2="120" stroke="#2f5f8f" stroke-width="7" opacity=".28"/>
+<text id="tLabel" x="42" y="250" font-size="20" font-weight="800" fill="#2f5f8f" transform="rotate(-90 42 250)">t = 1.000 in</text>
+<line id="xDim" x1="95" y1="425" x2="500" y2="425" stroke="#6b7c8c" stroke-width="2"/>
+<line x1="95" y1="416" x2="95" y2="434" stroke="#6b7c8c" stroke-width="2"/>
+<line id="xDimEnd" x1="500" y1="416" x2="500" y2="434" stroke="#6b7c8c" stroke-width="2"/>
+<text id="xLabel" x="295" y="457" text-anchor="middle" font-size="18" fill="#5d6a75">d + s</text>
+<line id="centerLine" x1="95" y1="400" x2="500" y2="120" stroke="#6b7c8c" stroke-width="3" stroke-dasharray="9 8"/>
+<line id="tangentLine" x1="95" y1="400" x2="460" y2="92" stroke="#263746" stroke-width="4"/>
+<circle id="rodCircle" cx="500" cy="120" r="70" fill="#dce4ea" fill-opacity=".82" stroke="#7f8f9f" stroke-width="3"/>
+<circle id="centerDot" cx="500" cy="120" r="5" fill="#263746"/>
+<text id="centerText" x="516" y="153" font-size="15" fill="#33414e">C(d+s, t)</text>
+<line id="radiusLine" x1="500" y1="120" x2="460" y2="92" stroke="#9a6800" stroke-width="3"/>
+<text id="dLabel" x="480" y="94" font-size="17" font-weight="800" fill="#9a6800">d</text>
+<path id="angleArc" d="" fill="none" stroke="#a23b32" stroke-width="5"/>
+<text id="angleLabel" x="143" y="355" font-size="21" font-weight="900" fill="#a23b32">tilt = 1.122°</text>
+<circle cx="95" cy="400" r="5" fill="#263746"/><text x="104" y="392" font-size="14" fill="#5d6a75">Origin</text>
+</svg>
+<div class="legend"><span><span class="sw" style="background:#263746"></span>Limiting tangent line</span><span><span class="sw" style="background:#6b7c8c"></span>Centerline to C</span><span><span class="sw" style="background:#9a6800"></span>Rod geometry</span></div>
+<div class="prompt" id="promptBox">Ask the class: which variable do you expect to change the tilt most—<b>d</b>, <b>t</b>, or <b>s</b>?</div>
+<div class="callout" id="interpretation"></div>
+</section>
+
+<aside class="panel controls">
+<div class="control"><label><span>Rod diameter, d</span><span id="dOut"></span></label><input id="dSlider" type="range" min="0.125" max="1" step="0.125" value="0.5"><small>1/8 in stock increments</small></div>
+<div class="control"><label><span>Wall thickness, t</span><span id="tOut"></span></label><input id="tSlider" type="range" min="0.125" max="1.05" step="0.005" value="1">
+<div class="quick"><button data-t=".125">1/8"</button><button data-t=".25">1/4"</button><button data-t=".5">1/2"</button><button data-t=".75">3/4"</button><button data-t="1">1"</button><button data-t=".99">0.990" WC</button><button data-t=".74">0.740" WC</button></div></div>
+<div class="control"><label><span>Net spacing, s</span><span id="sOut"></span></label><input id="sSlider" type="range" min="0.5" max="2" step="0.01" value="0.5"><small>Converted internally to inches</small></div>
+
+<div class="readout" aria-live="polite">
+<div class="metric status good" id="statusBox"><div class="k">2° requirement</div><div class="v" id="status"></div></div>
+<div class="metric"><div class="k">Tilt</div><div class="v" id="tiltOut"></div></div>
+<div class="metric"><div class="k">Margin to 2°</div><div class="v" id="marginOut"></div></div>
+<div class="metric advanced"><div class="k">∂tilt/∂s</div><div class="v" id="dsOut"></div></div>
+<div class="metric advanced"><div class="k">∂tilt/∂t</div><div class="v" id="dtOut"></div></div>
+<div class="metric advanced"><div class="k">∂tilt/∂d</div><div class="v" id="ddOut"></div></div>
+<div class="metric advanced"><div class="k">Hole diameter implied</div><div class="v" id="holeOut"></div></div>
+</div>
+
+<div class="formula advanced">θ(d,t,s) = atan((d+s)/t) − asin(d / √(t²+(d+s)²))</div>
+<small class="advanced">Lecture Mode hides the sensitivity values so students can make a prediction before you reveal the math.</small>
+</aside>
+</div>
+
+<p class="footer">Model assumption: s is the net diametral clearance represented on one side in the limiting-contact geometry. The tool isolates geometric slop; it does not model elastic deflection, wear, cylindricity, straightness, or other manufacturing/geometric errors.</p>
+</div>
+
+<script>
+(()=>{const $=id=>document.getElementById(id),dS=$("dSlider"),tS=$("tSlider"),sS=$("sSlider"),lecture=$("lectureMode"),deg=r=>r*180/Math.PI,mmToIn=mm=>mm/25.4;
+const presets={nominal:{d:.5,t:1,s:.5},wc1:{d:.125,t:.99,s:.75},nom075:{d:.5,t:.75,s:.5},wc075:{d:.125,t:.74,s:.75}};
+function calc(d,t,s){const R2=t*t+(d+s)*(d+s),R=Math.sqrt(R2),q=Math.sqrt(t*t+2*d*s+s*s),theta=Math.atan((d+s)/t)-Math.asin(d/R),dd=t/R2-(t*t+s*(d+s))/(R2*q),dt=-(d+s)/R2+(d*t)/(R2*q),ds=t/R2+d*(d+s)/(R2*q);return{thetaDeg:deg(theta),ddDegIn:deg(dd),dtDegIn:deg(dt),dsDegMm:deg(ds)/25.4}}
+function signed(x,n=3){return(x<0?"−":"")+Math.abs(x).toFixed(n)}
+function draw(d,t,s,theta){const ox=95,oy=400,xScale=345,yScale=280,cx=ox+Math.min(520,(d+s)*xScale),cy=oy-Math.min(330,t*yScale),r=Math.max(24,Math.min(92,d*120)),vx=cx-ox,vy=cy-oy,L2=vx*vx+vy*vy;let tx=cx,ty=cy-r;if(L2>r*r){const a=1-r*r/L2,h=r*Math.sqrt(Math.max(0,L2-r*r))/L2;tx=ox+a*vx-h*vy;ty=oy+a*vy+h*vx}
+[["centerLine","x2",cx],["centerLine","y2",cy],["tangentLine","x2",tx],["tangentLine","y2",ty],["rodCircle","cx",cx],["rodCircle","cy",cy],["rodCircle","r",r],["centerDot","cx",cx],["centerDot","cy",cy],["radiusLine","x1",cx],["radiusLine","y1",cy],["radiusLine","x2",tx],["radiusLine","y2",ty],["tGuide","y2",cy],["xDim","x2",cx],["xDimEnd","x1",cx],["xDimEnd","x2",cx]].forEach(a=>$(a[0]).setAttribute(a[1],a[2]));
+$("centerText").setAttribute("x",cx+14);$("centerText").setAttribute("y",cy-8);$("dLabel").setAttribute("x",(cx+tx)/2+6);$("dLabel").setAttribute("y",(cy+ty)/2-7);$("tLabel").textContent=`t = ${t.toFixed(3)} in`;$("xLabel").setAttribute("x",(ox+cx)/2);$("xLabel").textContent=`d + s = ${(d+s).toFixed(3)} in`;
+const a1=Math.atan2(cy-oy,cx-ox),a2=Math.atan2(ty-oy,tx-ox),rr=70,p1=[ox+rr*Math.cos(a1),oy+rr*Math.sin(a1)],p2=[ox+rr*Math.cos(a2),oy+rr*Math.sin(a2)];$("angleArc").setAttribute("d",`M ${p1[0]} ${p1[1]} A ${rr} ${rr} 0 0 0 ${p2[0]} ${p2[1]}`);$("angleLabel").textContent=`tilt = ${theta.toFixed(3)}°`}
+function updateMode(){document.querySelectorAll(".advanced").forEach(el=>el.classList.toggle("hidden",lecture.checked));$("promptBox").classList.toggle("hidden",!lecture.checked)}
+function update(){const d=+dS.value,t=+tS.value,smm=+sS.value,s=mmToIn(smm),c=calc(d,t,s);$("dOut").textContent=d.toFixed(3)+" in";$("tOut").textContent=t.toFixed(3)+" in";$("sOut").textContent=smm.toFixed(3)+" mm";$("tiltOut").textContent=c.thetaDeg.toFixed(3)+"°";$("marginOut").textContent=(2-c.thetaDeg).toFixed(3)+"°";$("dsOut").textContent=signed(c.dsDegMm)+"°/mm";$("dtOut").textContent=signed(c.dtDegIn)+"°/in";$("ddOut").textContent=signed(c.ddDegIn)+"°/in";$("holeOut").textContent=(d+s).toFixed(4)+" in";const pass=c.thetaDeg<2;$("status").textContent=pass?"PASS":"FAIL";$("statusBox").className="metric status "+(pass?"good":"bad");$("interpretation").innerHTML=pass?`Current geometry is <b>${(2-c.thetaDeg).toFixed(3)}° below</b> the 2° limit. Increase <b>s</b> or decrease <b>t</b> to see how quickly the margin is consumed.`:`Current geometry is <b>${(c.thetaDeg-2).toFixed(3)}° above</b> the 2° limit. Increase <b>t</b> and/or reduce <b>s</b> to recover margin.`;draw(d,t,s,c.thetaDeg);updateMode()}
+[dS,tS,sS].forEach(el=>el.addEventListener("input",update));lecture.addEventListener("change",updateMode);document.querySelectorAll("[data-t]").forEach(b=>b.addEventListener("click",()=>{tS.value=b.dataset.t;update()}));document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{const p=presets[b.dataset.preset];dS.value=p.d;tS.value=p.t;sS.value=p.s;update()}));$("resetBtn").addEventListener("click",()=>{dS.value=.5;tS.value=1;sS.value=.5;lecture.checked=true;update()});update()})();
+</script>
+</body>
+</html>
